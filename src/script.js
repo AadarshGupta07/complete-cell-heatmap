@@ -233,11 +233,13 @@ function create() {
 
     let cell, batteryCap;
 
-
+    let cellID = 0
     for (let layer = 1; layer <= numCellsZ; layer++) {
         for (let row = 1; row <= numCellsY; row++) {
+            cellID+=1
             for (let col = 1; col <= numCellsX; col++) {
                 cell = new THREE.Mesh(new THREE.CylinderGeometry(cellRadius, cellRadius, cellHeight, 32));
+                cell.name = `cell${cellID}`
                 cell.position.set(
                     col * (cellRadius * 2 + cellSpacing) - numCellsX / 2 * (cellRadius * 2 + cellSpacing) + cellRadius,
                     row * (cellHeight + cellSpacing),
@@ -246,6 +248,7 @@ function create() {
 
                 // Create the positive terminal cap for this cell
                 batteryCap = new THREE.Mesh(new THREE.CylinderGeometry(cellRadius - 0.25, cellRadius - 0.25, 0.1, 32));
+                batteryCap.name = `batteryCap`
                 batteryCap.position.set(
                     cell.position.x,
                     cell.position.y + cellHeight / 2 + 0.05,
@@ -399,7 +402,7 @@ btn.addEventListener('click', create)
 window.onload = function () {
     var inputs = document.getElementsByClassName("input");
     for (var i = 0; i < inputs.length; i++) {
-        inputs[i].value = "1";
+        inputs[i].value = "2";
     }
     create()
 };
@@ -413,6 +416,12 @@ gridHelper.position.y = -0.5
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
+import OutlineEffect from './OutlineEffect';
+import GetMeshData from './GetMeshData.js';
+
+let outlineEffect = new OutlineEffect(scene, camera, renderer);
+const GetMeshDataInstance = new GetMeshData();
+GetMeshDataInstance.debugMode = false
 /**
  * Animate
  */
@@ -435,7 +444,8 @@ const tick = () => {
     controls.update()
 
     // Render
-    renderer.render(scene, camera)
+    // renderer.render(scene, camera)
+    outlineEffect.render();
 
     fpsGraph.end()
 
